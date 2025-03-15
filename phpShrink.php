@@ -41,7 +41,7 @@ function phpShrink($input) {
 
 	foreach ($tokens as $i => $token) {
 		if ($token[0] === T_VARIABLE && !isset($special_variables[$token[1]])) {
-			$short_variables[$token[1]] = ($short_variables[$token[1]] ?? 0) + 1;
+			$short_variables[$token[1]] = arrayIdx($short_variables, $token[1], 0) + 1;
 		}
 	}
 
@@ -133,4 +133,8 @@ function shortIdentifier($number, $chars) {
 		$number = floor($number / strlen($chars)) - 1;
 	}
 	return $return;
+}
+
+function arrayIdx($array, $key, $default = null) {
+	return (array_key_exists($key, $array) ? $array[$key] : $default);
 }
