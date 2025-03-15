@@ -7,7 +7,7 @@ Operations:
 - minify variables, e.g. in `function f($long) { return $long; }` (incompatible with https://php.net/functions.arguments#functions.named-arguments)
 - remove extra `{}`, e.g. in `if (true) { oneCommand(); }`
 - remove `?><?php` and empty `<?php ?>`
-- change `?>HTML<?php` to `echo 'HTML'` if it saves space
+- change `?>HTML<?php` to `echo 'HTML'`
 - join consecutive echo, e.g. in `echo 'a'; echo 'b';`
 - strip public visibility or change it to `var`
 

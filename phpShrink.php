@@ -50,11 +50,8 @@ function phpShrink($input) {
 	}
 
 	foreach ($tokens as $i => $token) {
-		if (
-			isset($tokens[$i+4])
-			&& $tokens[$i+2][0] === T_CLOSE_TAG && $tokens[$i+3][0] === T_INLINE_HTML && $tokens[$i+4][0] === T_OPEN_TAG
-			&& strlen(addcslashes($tokens[$i+3][1], "\\'")) < strlen($tokens[$i+3][1]) + 3
-		) {
+		if (isset($tokens[$i+4]) && $tokens[$i+2][0] === T_CLOSE_TAG && $tokens[$i+3][0] === T_INLINE_HTML && $tokens[$i+4][0] === T_OPEN_TAG) {
+			// we do this even if the output is longer to profit from joining consecutive echos
 			$tokens[$i+2] = array(T_ECHO, 'echo');
 			$tokens[$i+3] = array(T_CONSTANT_ENCAPSED_STRING, "'" . addcslashes($tokens[$i+3][1], "\\'") . "'");
 			$tokens[$i+4] = array(0, ';');
