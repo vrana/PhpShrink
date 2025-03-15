@@ -125,7 +125,7 @@ function phpShrink($input) {
 }
 
 function nextToken($tokens, $i, $search, $allowed = array()) {
-	for ($i += 1; isset($tokens[$i]) && in_array($tokens[$i][0], $allowed); $i++) {
+	for ($i++; isset($tokens[$i]) && in_array($tokens[$i][0], $allowed); $i++) {
 	}
 	return (isset($tokens[$i]) && $tokens[$i][0] === $search ? $i : 0);
 }
