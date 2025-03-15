@@ -4,7 +4,7 @@ Remove spaces and comments from PHP code.
 Operations:
 - remove unnecessary whitespace, change necessary whitespace to `\n`
 - strip comments, preserve only the first doc-comment
-- minify variables, e.g. in `function f($long) { return $long; }` (incompatible with https://php.net/functions.arguments#functions.named-arguments)
+- minify variables, e.g. in `function f($long) { return $long; }` (incompatible with `$GLOBALS` and named arguments)
 - remove extra `{}`, e.g. in `if (true) { oneCommand(); }`
 - remove `?><?php` and empty `<?php ?>`
 - change `?>HTML<?php` to `echo 'HTML'`

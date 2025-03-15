@@ -44,8 +44,12 @@ function phpShrink($input) {
 	$tokens = array_values($tokens);
 
 	foreach ($tokens as $i => $token) {
-		if ($token[0] === T_VARIABLE && !isset($special_variables[$token[1]])) {
-			$short_variables[$token[1]] = arrayIdx($short_variables, $token[1], 0) + 1;
+		if ($token[0] === T_VARIABLE) {
+			if (!isset($special_variables[$token[1]])) {
+				$short_variables[$token[1]] = arrayIdx($short_variables, $token[1], 0) + 1;
+			} elseif ($token[1] == '$GLOBALS') {
+				trigger_error('$GLOBALS is not supported, use global', E_USER_WARNING);
+			}
 		}
 	}
 
