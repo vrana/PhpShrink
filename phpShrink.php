@@ -30,9 +30,13 @@ function phpShrink($input) {
 			} elseif ($shorten > 1) {
 				$shorten = 0;
 			}
-		} elseif ($token === '}' && $opening >= 0 && $shorten == 1) {
+		} elseif ($token === '}' && $opening >= 0 && $shorten > 0) {
 			unset($tokens[$opening]);
-			unset($tokens[$i]);
+			if ($shorten == 1) { // one command block: if (true) {;}
+				unset($tokens[$i]);
+			} else {
+				$tokens[$i] = ';'; // empty block: if (true) {}
+			}
 			$shorten = 0;
 			$opening = -1;
 		}
