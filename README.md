@@ -10,4 +10,6 @@ Operations:
 - join consecutive echo, e.g. in `echo 'a'; echo 'b';`
 - strip public visibility or change it to `var`
 
+Demo: https://vrana.github.io/PhpShrink/
+
 The main user is [Adminer](https://www.adminer.org/).
