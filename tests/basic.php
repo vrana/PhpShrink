@@ -50,3 +50,4 @@ check('echo 1; /**/ echo 2;', 'echo 1,2;');
 check('echo 1; ?>2<?php echo 3;', "echo 1,'2',3;");
 check('/** preserve */ $a; /** ignore */ /* also ignore */ // ignore too', '/** preserve */$a;');
 check('$a = 1; ?><?php ?><?php $a = 2;', '$a=1;$a=2;');
+check('$a = 1; ?>', '$a=1;');
