@@ -65,15 +65,15 @@ function phpShrink($input) {
 			$opening = -1;
 		} elseif (in_array($token[0], array(T_SWITCH, T_FUNCTION, T_CLASS, T_CLOSE_TAG))) {
 			$shorten = 0;
-		} elseif ($token[1] == ';') {
+		} elseif ($token == array(0, ';')) {
 			$shorten--;
-		} elseif ($token[1] == '{') {
+		} elseif ($token == array(0, '{')) {
 			if ($opening < 0) {
 				$opening = $i;
 			} elseif ($shorten > 1) {
 				$shorten = 0;
 			}
-		} elseif ($token[1] == '}' && $opening >= 0 && $shorten > 0) {
+		} elseif ($token == array(0, '}') && $opening >= 0 && $shorten > 0) {
 			unset($tokens[$opening]);
 			if ($shorten == 1) { // one command block: if (true) {;}
 				unset($tokens[$i]);

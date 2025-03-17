@@ -58,6 +58,7 @@ check('echo 1; ?>2<?php echo 3;', "echo 1,'2',3;");
 check('if (true) { echo 1; echo 2; }', 'if(true)echo 1,2;');
 check('if (true) { echo 1; } echo 2; echo 3;', 'if(true)echo 1;echo 2,3;');
 check('if (true) echo 1; echo 2; echo 3;', 'if(true)echo 1;echo 2,3;');
+check('if (true) { echo "$a}"; }', 'if(true)echo"$a}";');
 check('for ($i = 0; $i < 5; $i++) echo 1; echo 2; echo 3;', 'for($a=0;$a<5;$a++)echo 1;echo 2,3;');
 check('/** preserve */ $a; /** ignore */ /* also ignore */ // ignore too', '/** preserve */$a;');
 check('$a = 1; ?><?php ?><?php $a = 2;', '$a=1;$a=2;');
