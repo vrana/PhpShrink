@@ -7,12 +7,10 @@
 function phpShrink($input) {
 	// based on http://latrine.dgx.cz/jak-zredukovat-php-skripty
 	$input = preg_replace("~<\\?php\\s*\\?>\n?|\\?>\n?<\\?php|\\?>\n?\$~", '', $input);
-	$special_variables = array_flip(array('$this', '$GLOBALS', '$_GET', '$_POST', '$_FILES', '$_COOKIE', '$_SESSION', '$_SERVER', '$http_response_header', '$php_errormsg'));
-	$short_variables = array();
-	$shortening = true;
 	$tokens = token_get_all($input);
 
 	// remove unnecessary { }
+	//! do this after joining echos
 	//! change also `while () { if () {;} }` to `while () if () ;` but be careful about `if () { if () { } } else { }
 	$shorten = 0;
 	$opening = -1;
@@ -43,6 +41,8 @@ function phpShrink($input) {
 	}
 	$tokens = array_values($tokens);
 
+	$special_variables = array_flip(array('$this', '$GLOBALS', '$_GET', '$_POST', '$_FILES', '$_COOKIE', '$_SESSION', '$_SERVER', '$http_response_header', '$php_errormsg'));
+	$short_variables = array();
 	foreach ($tokens as $i => $token) {
 		if ($token[0] === T_VARIABLE) {
 			if (!isset($special_variables[$token[1]])) {
@@ -73,9 +73,11 @@ function phpShrink($input) {
 		$short_variables[$key] = shortIdentifier($number, $chars); // could use also numbers and \x7f-\xff
 	}
 
+	$shortening = true;
 	$set = array_flip(preg_split('//', '!"#$%&\'()*+,-./:;<=>?@[]^`{|}'));
 	$space = '';
 	$output = '';
+	$echo_after = 0; // how many semicolons do we need to start joining echos
 	$in_echo = false;
 	$doc_comment = false; // include only first /**
 	$next_pos = 0;
@@ -101,16 +103,25 @@ function phpShrink($input) {
 				if ($token[1] == ';' || $token[0] == T_FUNCTION) {
 					$shortening = true;
 				}
+			} elseif (in_array($token[0], array(T_IF, T_ELSE, T_ELSEIF, T_WHILE, T_DO, T_FOR, T_FOREACH), true)) {
+				$echo_after = ($token[0] == T_FOR ? 3 : 1);
 			} elseif ($token[0] == T_ECHO) {
-				$in_echo = true;
-			} elseif ($token[1] == ';' && $in_echo) {
-				$next_echo = nextToken($tokens, $i, T_ECHO, array(T_WHITESPACE, T_COMMENT));
-				if ($next_echo) {
-					// join two consecutive echos
-					$next_pos = $next_echo + 1;
-					$token[1] = ','; // '.' would conflict with "a".1+2 and would use more memory //! remove ',' and "," but not $var","
-				} else {
-					$in_echo = false;
+				if ($echo_after <= 0) {
+					$in_echo = true;
+				}
+			} elseif ($token[1] == '{') {
+				$echo_after = 0;
+			} elseif ($token[1] == ';') {
+				$echo_after--;
+				if ($in_echo) {
+					$next_echo = nextToken($tokens, $i, T_ECHO, array(T_WHITESPACE, T_COMMENT));
+					if ($next_echo) {
+						// join two consecutive echos
+						$next_pos = $next_echo + 1;
+						$token[1] = ','; // '.' would conflict with "a".1+2 and would use more memory //! remove ',' and "," but not $var","
+					} else {
+						$in_echo = false;
+					}
 				}
 			} elseif ($token[0] === T_VARIABLE && !isset($special_variables[$token[1]])) {
 				$token[1] = '$' . $short_variables[$token[1]];

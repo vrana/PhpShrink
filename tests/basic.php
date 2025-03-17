@@ -4,7 +4,8 @@ include __DIR__ . "/../phpShrink.php";
 function check($code, $expected) {
 	$shrinked = str_replace("\n", " ", phpShrink("<?php\n$code"));
 	if ("<?php $expected" != $shrinked) {
-		$backtrace = debug_backtrace()[0];
+		$backtrace = debug_backtrace();
+		$backtrace = $backtrace[0];
 		echo "$backtrace[file]:$backtrace[line]:" . substr($shrinked, 6) . "\n";
 	}
 }
@@ -13,11 +14,11 @@ set_error_handler(function ($errno) {
 	return ($errno == E_USER_WARNING);
 });
 
-//! inefficiencies
-check('echo "a"."b",\'c\'."d$a"."e";', 'echo "abcd$a"."e"');
-
 // officially unsupported
 check('$ab = 1; echo $GLOBALS["ab"];', '$a=1;echo$GLOBALS["ab"];');
+
+//! inefficiencies
+check('echo "a"."b",\'c\'."d$a"."e";', 'echo "abcd$a"."e"');
 
 check('$ab = 1; echo $ab;', '$a=1;echo$a;');
 check('$ab = 1; $cd = 2;', '$a=1;$b=2;');
@@ -48,6 +49,10 @@ check('$ab = 1; function f() { global $ab; return $ab; }', '$a=1;function f(){gl
 check('echo 1; echo 3;', 'echo 1,3;');
 check('echo 1; /**/ echo 2;', 'echo 1,2;');
 check('echo 1; ?>2<?php echo 3;', "echo 1,'2',3;");
+check('if (true) { echo 1; echo 2; }', 'if(true){echo 1,2;}'); // this should remove {}
+check('if (true) { echo 1; } echo 2; echo 3;', 'if(true)echo 1;echo 2,3;');
+check('if (true) echo 1; echo 2; echo 3;', 'if(true)echo 1;echo 2,3;');
+check('for ($i = 0; $i < 5; $i++) echo 1; echo 2; echo 3;', 'for($a=0;$a<5;$a++)echo 1;echo 2,3;');
 check('/** preserve */ $a; /** ignore */ /* also ignore */ // ignore too', '/** preserve */$a;');
 check('$a = 1; ?><?php ?><?php $a = 2;', '$a=1;$a=2;');
 check('$a = 1; ?>', '$a=1;');
