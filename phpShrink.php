@@ -1,12 +1,12 @@
 <?php
 
-/** Minify PHP code.
+/** Minify PHP code. Based on http://latrine.dgx.cz/jak-zredukovat-php-skripty.
 * @param string PHP code including <?php
 * @return string
 */
 function phpShrink($input) {
-	// based on http://latrine.dgx.cz/jak-zredukovat-php-skripty
-	$input = preg_replace("~<\\?php\\s*\\?>\n?|\\?>\n?<\\?php|\\?>\n?\$~", '', $input);
+	//! ignore in strings and doc comment
+	$input = preg_replace("~<\\?php\\s*\\?>\n?|\\?>\n?<\\?php|(<?php\s)\s+|\\?>\n?\$~", '\1', $input);
 	$tokens = token_get_all($input);
 
 	/* change ?>HTML<?php to echo '' */

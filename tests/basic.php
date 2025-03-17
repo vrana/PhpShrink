@@ -63,3 +63,4 @@ check('for ($i = 0; $i < 5; $i++) echo 1; echo 2; echo 3;', 'for($a=0;$a<5;$a++)
 check('/** preserve */ $a; /** ignore */ /* also ignore */ // ignore too', '/** preserve */$a;');
 check('$a = 1; ?><?php ?><?php $a = 2;', '$a=1;$a=2;');
 check('$a = 1; ?>', '$a=1;');
+check("\necho 1;", 'echo 1;');
