@@ -1,21 +1,27 @@
 <?php
 include __DIR__ . "/../phpShrink.php";
 
-function check($code, $expected) {
+$last_error = 0;
+
+function check($code, $expected, $error = 0) {
+	global $last_error;
+	$last_error = 0;
 	$shrinked = str_replace("\n", " ", phpShrink("<?php\n$code"));
-	if ("<?php $expected" != $shrinked) {
+	if ($last_error != $error || "<?php $expected" != $shrinked) {
 		$backtrace = debug_backtrace();
 		$backtrace = $backtrace[0];
-		echo "$backtrace[file]:$backtrace[line]:" . substr($shrinked, 6) . "\n";
+		echo "$backtrace[file]:$backtrace[line]:" . substr($shrinked, 6) . ($last_error != $error ? " (error: $last_error)" : "") . "\n";
 	}
 }
 
 set_error_handler(function ($errno) {
+	global $last_error;
+	$last_error = $errno;
 	return ($errno == E_USER_WARNING);
 });
 
 // officially unsupported
-check('$ab = 1; echo $GLOBALS["ab"];', '$a=1;echo$GLOBALS["ab"];');
+check('$ab = 1; echo $GLOBALS["ab"];', '$a=1;echo$GLOBALS["ab"];', E_USER_WARNING);
 
 //! inefficiencies
 check('echo "a"."b",\'c\'."d$a"."e";', 'echo "abcd$a"."e"');
