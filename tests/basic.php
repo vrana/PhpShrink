@@ -55,7 +55,7 @@ check('$ab = 1; function f() { global $ab; return $ab; }', '$a=1;function f(){gl
 check('echo 1; echo 3;', 'echo 1,3;');
 check('echo 1; /**/ echo 2;', 'echo 1,2;');
 check('echo 1; ?>2<?php echo 3;', "echo 1,'2',3;");
-check('if (true) { echo 1; echo 2; }', 'if(true){echo 1,2;}'); // this should remove {}
+check('if (true) { echo 1; echo 2; }', 'if(true)echo 1,2;');
 check('if (true) { echo 1; } echo 2; echo 3;', 'if(true)echo 1;echo 2,3;');
 check('if (true) echo 1; echo 2; echo 3;', 'if(true)echo 1;echo 2,3;');
 check('for ($i = 0; $i < 5; $i++) echo 1; echo 2; echo 3;', 'for($a=0;$a<5;$a++)echo 1;echo 2,3;');
