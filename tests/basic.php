@@ -23,6 +23,9 @@ set_error_handler(function ($errno) {
 // officially unsupported
 check('$ab = 1; echo $GLOBALS["ab"];', '$a=1;echo$GLOBALS["ab"];', E_USER_WARNING);
 
+//! bugs
+check('class C { static public $x; }', 'class C{static$x;}'); // you must use public static
+
 //! inefficiencies
 check('echo "a"."b",\'c\'."d$a"."e";', 'echo "abcd$a"."e"');
 
@@ -37,8 +40,10 @@ check('class C { private $ab = 1; }', 'class C{private$ab=1;}');
 check('class C { private $ab = 1; }', 'class C{private$ab=1;}');
 check('class C { private function f($ab) { return $ab; }}', 'class C{private function f($a){return$a;}}');
 check('class C { public function f($ab) { return $ab; }}', 'class C{function f($a){return$a;}}');
-check('class C { private static $ab; }', 'class C{private static$ab;}');
-check('class C { public static $ab; }', 'class C{static$ab;}');
+check('class C { private static $x; function f($x) { self::$x; $x; } }', 'class C{private static$a;function f($a){self::$a;$a;}}');
+check('class C { public static $x; } echo C::$x;', 'class C{static$a;}echo C::$a;');
+check('class C { static $x; }', 'class C{static$a;}');
+check('function f() { static $x; return $x; }', 'function f(){static$a;return$a;}');
 check('class C { const AB = 1; }', 'class C{const AB=1;}');
 check('class C { private const AB = 1; }', 'class C{private const AB=1;}');
 check('class C { public $ab; function f($cd) { return $cd . $this->ab; }}', 'class C{var$ab;function f($b){return$b.$this->ab;}}');

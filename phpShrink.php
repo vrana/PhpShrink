@@ -128,7 +128,7 @@ function phpShrink($input) {
 				}
 				$shortening = false;
 			} elseif (!$shortening) {
-				if ($token[1] == ';' || $token[0] == T_FUNCTION) {
+				if ($token[1] == ';' || $token[0] == T_FUNCTION || $token[0] == T_STATIC) {
 					$shortening = true;
 				}
 			} elseif ($token[0] === T_VARIABLE && !isset($special_variables[$token[1]])) {
