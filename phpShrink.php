@@ -111,7 +111,7 @@ function phpShrink($input) {
 
 	// shorten variables and remove whitespace
 	$shortening = true;
-	$set = array_flip(preg_split('//', '!"#$%&\'()*+,-./:;<=>?@[]^`{|}'));
+	$set = array_flip(preg_split('//', '!"#$%&\'()*+,-/:;<=>?@[]^`{|}'));
 	$space = '';
 	$output = '';
 	$doc_comment = false; // include only first /**
@@ -134,7 +134,11 @@ function phpShrink($input) {
 			} elseif ($token[0] === T_VARIABLE && !isset($special_variables[$token[1]])) {
 				$token[1] = '$' . $short_variables[$token[1]];
 			}
-			if (isset($set[substr($output, -1)]) || isset($set[$token[1][0]])) {
+			$last = substr($output, -1);
+			if (isset($set[$last]) || isset($set[$token[1][0]])
+				|| ($last == '.' && $token[0] != T_LNUMBER && $token[0] != T_DNUMBER)
+				|| ($token[1] == '.' && !preg_match('~[0-9]~', $last))
+			) {
 				$space = '';
 			}
 			$output .= $space . $token[1];

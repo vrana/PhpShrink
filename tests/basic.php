@@ -70,3 +70,7 @@ check('/** preserve */ $a; /** ignore */ /* also ignore */ // ignore too', '/** 
 check('$a = 1; ?><?php ?><?php $a = 2;', '$a=1;$a=2;');
 check('$a = 1; ?>', '$a=1;');
 check("\necho 1;", 'echo 1;');
+check('A . 1', 'A. 1');
+check('A . 1.1', 'A. 1.1');
+check('1 . A', '1 .A');
+check('1. . A', '1..A');
