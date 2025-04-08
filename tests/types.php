@@ -31,6 +31,9 @@ check('function (): ?int {}', 'function () {}');
 check('public ?array $a;', 'public $a;');
 check('public stdClass $a;', 'public $a;');
 check('public \stdClass $a;', 'public $a;');
+check('public static $a;', 'public static $a;');
+check('public static array $a;', 'public static $a;');
+check('static public $a;', 'static public $a;');
 
 // not supported
 check('var A|B $a;', 'var A|B $a;');

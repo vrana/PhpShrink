@@ -183,7 +183,7 @@ function stripTypes($input) {
 		. '|bool|int|float|string|object|resource|self|parent|static|true|false|null|callable'
 		. ')\s*(&?\s*\$)~', '\1\3', $return
 	);
-	$return = preg_replace('~(public|protected|private|var|static)\s*\??\s*[\w\\\\]+(\s*\$)~U', '\1\2', $return);
+	$return = preg_replace('~(((public|protected|private|var|static)\b\s*)++)\??\s*[\w\\\\]+\s*(\$)~', '\1\4', $return);
 	$return = preg_replace('~\):\s*\??\s*[\w\\\\]+(\s*[;{])~U', ')\1', $return);
 	return $return;
 }
