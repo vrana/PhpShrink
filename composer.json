@@ -8,22 +8,10 @@
             "homepage": "https://www.vrana.cz"
         }
     ],
-    "autoload": {
-        "files": [
-            "phpShrink.js"
-        ]
-    },
     "license": [
         "Apache-2.0"
     ],
     "require": {
         "php": ">=5.3"
-    },
-    "extra": {
-        "component": {
-            "scripts": [
-                "phpShrink.js"
-            ]
-        }
     }
 }
