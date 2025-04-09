@@ -167,23 +167,3 @@ function shortIdentifier($number, $chars) {
 function arrayIdx($array, $key, $default = null) {
 	return (array_key_exists($key, $array) ? $array[$key] : $default);
 }
-
-/** Strip type declarations not supported by PHP 5
-* @param string
-* @return string
-*/
-function stripTypes($input) {
-	// this uses a simple regulat expression, it doesn't even ignore strings
-	// anything more complicated should be done using https://github.com/nikic/PHP-Parser
-	$return = $input;
-	$return = preg_replace(
-		'~([(,]\s*)(' // only match after ( or ,
-		. '\?[\w\\\\]+' // nullable
-		// . '|\S+[&|(]\S+' // union, intersection, DNF not supported
-		. '|bool|int|float|string|object|resource|self|parent|static|true|false|null|callable'
-		. ')\s*(&?\s*\$)~', '\1\3', $return
-	);
-	$return = preg_replace('~(((public|protected|private|var|static)\b\s*)++)\??\s*[\w\\\\]+\s*(\$)~', '\1\4', $return);
-	$return = preg_replace('~\):\s*\??\s*[\w\\\\]+(\s*[;{])~U', ')\1', $return);
-	return $return;
-}

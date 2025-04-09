@@ -12,6 +12,7 @@
         "Apache-2.0"
     ],
     "require": {
-        "php": ">=5.3"
+        "php": ">=7.4",
+        "nikic/php-parser": "^5.4"
     }
 }
