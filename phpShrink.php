@@ -114,6 +114,7 @@ function phpShrink($input) {
 	$set = array_flip(preg_split('//', '!"#$%&\'()*+,-/:;<=>?@[]^`{|}'));
 	$space = '';
 	$output = '';
+	$static = 0; // context of the static keyword
 	$doc_comment = false; // include only first /**
 	foreach ($tokens as $i => $token) {
 		if ($token[0] == T_COMMENT || $token[0] == T_WHITESPACE || ($token[0] == T_DOC_COMMENT && $doc_comment)) {
@@ -122,16 +123,19 @@ function phpShrink($input) {
 			if ($token[0] == T_DOC_COMMENT) {
 				$doc_comment = true;
 			}
-			if ($token[0] == T_VAR || $token[0] == T_PUBLIC || $token[0] == T_PROTECTED || $token[0] == T_PRIVATE) {
+			if ($token[0] == T_FUNCTION || $token[0] == T_CLASS) {
+				$static = $token[0];
+			}
+			if ($token[0] == T_VAR || $token[0] == T_PUBLIC || $token[0] == T_PROTECTED || $token[0] == T_PRIVATE || ($token[0] == T_STATIC && $static != T_FUNCTION)) {
 				if ($token[0] == T_PUBLIC) {
 					$token[1] = ($tokens[$i+2][1][0] == '$' ? 'var' : '');
 				}
 				$shortening = false;
 			} elseif (!$shortening) {
-				if ($token[1] == ';' || $token[0] == T_FUNCTION || $token[0] == T_STATIC) {
+				if ($token[1] == ';' || $token[0] == T_FUNCTION || ($token[0] == T_STATIC && $static == T_FUNCTION)) {
 					$shortening = true;
 				}
-			} elseif ($token[0] === T_VARIABLE && !isset($special_variables[$token[1]])) {
+			} elseif ($token[0] === T_VARIABLE && !isset($special_variables[$token[1]]) && $tokens[$i-1][0] != T_DOUBLE_COLON) {
 				$token[1] = '$' . $short_variables[$token[1]];
 			}
 			$last = substr($output, -1);
