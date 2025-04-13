@@ -23,25 +23,21 @@ echo $abc;
 <div id="output"></div>
 
 <script type="text/javascript">
-let php;
-let output;
+let highlightShrink;
 (async function () {
 	const { PhpWeb } = await import('https://cdn.jsdelivr.net/npm/php-wasm@0.0.9-alpha-29/PhpWeb.mjs');
 	php = new PhpWeb({files: [
 		{name: 'phpShrink.php', url: 'https://raw.githubusercontent.com/vrana/PhpShrink/refs/heads/main/phpShrink.php'}
 	]});
-	php.addEventListener('output', event => output += event.detail);
-	php.addEventListener('error',  event => console.log(event.detail));
+	php.addEventListener('output', event => console.log(event.detail));
+	php.addEventListener('error',  event => console.error(event.detail));
 	await php.run(`<?php include "./phpShrink.php"; ?>`);
+	highlightShrink = await php.x`function ($input) { return highlight_string(phpShrink($input), true); }`;
 	shrink();
 	document.getElementById('input').oninput = shrink;
 })();
 
-async function shrink() {
-	php.inputString(document.getElementById('input').value);
-	output = '';
-	await php.run(`<?php highlight_string(phpShrink(file_get_contents("php://stdin"))); ?>`);
-	document.getElementById('output').innerHTML = output;
-	return false;
+function shrink() {
+	document.getElementById('output').innerHTML = highlightShrink(document.getElementById('input').value);
 }
 </script>
