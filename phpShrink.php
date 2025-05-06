@@ -59,6 +59,7 @@ function phpShrink($input) {
 	//! change also `while () { if () {;} }` to `while () if () ;` but be careful about `if () { if () { } } else { }
 	$shorten = 0;
 	$opening = -1;
+	$in_curly = false;
 	foreach ($tokens as $i => $token) {
 		if (in_array($token[0], array(T_IF, T_ELSE, T_ELSEIF, T_WHILE, T_DO, T_FOR, T_FOREACH))) {
 			$shorten = ($token[0] == T_FOR ? 4 : 2);
@@ -73,15 +74,21 @@ function phpShrink($input) {
 			} elseif ($shorten > 1) {
 				$shorten = 0;
 			}
-		} elseif ($token == array(0, '}') && $opening >= 0 && $shorten > 0) {
-			unset($tokens[$opening]);
-			if ($shorten == 1) { // one command block: if (true) {;}
-				unset($tokens[$i]);
-			} else {
-				$tokens[$i] = array(0, ';'); // empty block: if (true) {}
+		} elseif ($token[0] == T_CURLY_OPEN) {
+			$in_curly = true;
+		} elseif ($token == array(0, '}')) {
+			if ($in_curly) {
+				$in_curly = false;
+			} elseif ($opening >= 0 && $shorten > 0) {
+				unset($tokens[$opening]);
+				if ($shorten == 1) { // one command block: if (true) {;}
+					unset($tokens[$i]);
+				} else {
+					$tokens[$i] = array(0, ';'); // empty block: if (true) {}
+				}
+				$shorten = 0;
+				$opening = -1;
 			}
-			$shorten = 0;
-			$opening = -1;
 		}
 	}
 	$tokens = array_values($tokens);

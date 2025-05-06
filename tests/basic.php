@@ -58,6 +58,8 @@ check('if (true) { echo "a"; } else { echo "b"; }', 'if(true)echo"a";else echo"b
 check('for ($a=0; $a < 1; $a++) { echo 1; }', 'for($a=0;$a<1;$a++)echo 1;');
 check('for ($a=0; $a < 1; $a++) echo 1;', 'for($a=0;$a<1;$a++)echo 1;');
 check('for ($a=0; $a < 1; $a++) {}', 'for($a=0;$a<1;$a++);');
+check('foreach ($ab as $a) { echo "$a"; }', 'foreach($b as$a)echo"$a";');
+check('foreach ($ab as $a) { echo "{$a}"; }', 'foreach($b as$a)echo"{$a}";');
 check('{if (true) {} echo 1;}', '{if(true);echo 1;}');
 check('echo $_GET["a"];', 'echo$_GET["a"];');
 check('$ab = 1; echo $ab . "$ab";', '$a=1;echo$a."$a";');
