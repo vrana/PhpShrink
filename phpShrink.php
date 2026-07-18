@@ -6,7 +6,7 @@
 */
 function phpShrink($input) {
 	//! ignore in strings and doc comment
-	$input = preg_replace("~<\\?php\\s*\\?>\n?|\\?>\n?<\\?php|(<?php\s)\s+|\\?>\n?\$~", '\1', $input);
+	$input = preg_replace("~<\\?php\\s*\\?>\n?|\\?>\n?<\\?php|(<\\?php\\s)\\s+|\\?>\n?\$~", '\1', $input);
 	$tokens = token_get_all($input);
 
 	/* change ?>HTML<?php to echo '' */
