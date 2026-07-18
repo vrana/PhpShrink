@@ -228,7 +228,7 @@ function stripTypes($input) {
 		'~([(,]\s*)(' // only match after ( or ,
 		. '\?[\w\\\\]+' // nullable
 		// . '|\S+[&|(]\S+' // union, intersection, DNF not supported
-		. '|bool|int|float|string|object|resource|self|parent|static|true|false|null|callable'
+		. '|bool|int|float|string|object|resource|self|parent|static|true|false|null|callable|iterable'
 		. ')\s*(&?\s*\$)~', '\1\3', $return
 	);
 	$return = preg_replace('~(((public|protected|private|var|static)\b\s*)++)\??\s*[\w\\\\]+\s*(\$)~', '\1\4', $return);
