@@ -166,7 +166,7 @@ function phpShrink($input) {
 				if ($token[1] == ';' || $token[0] == T_FUNCTION || ($token[0] == T_STATIC && !inClass($contexts))) {
 					$shortening = true;
 				}
-			} elseif ($token[0] === T_VARIABLE && !isset($special_variables[$token[1]]) && $tokens[$i-1][0] != T_DOUBLE_COLON) {
+			} elseif ($token[0] === T_VARIABLE && !isset($special_variables[$token[1]]) && !prevToken($tokens, $i, T_DOUBLE_COLON, array(T_WHITESPACE, T_COMMENT, T_DOC_COMMENT))) {
 				$token[1] = '$' . $short_variables[$token[1]];
 			} elseif ($token[0] === T_STRING_VARNAME && !isset($special_variables['$' . $token[1]])) {
 				$token[1] = $short_variables['$' . $token[1]];
