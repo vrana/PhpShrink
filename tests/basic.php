@@ -24,9 +24,6 @@ set_error_handler(function ($errno) {
 // officially unsupported
 check('$ab = 1; echo $GLOBALS["ab"];', '$a=1;echo$GLOBALS["ab"];', E_USER_WARNING);
 
-//! bugs
-check('class C { static public $x; }', 'class C{static$x;}'); // you must use public static
-
 //! inefficiencies
 check('echo "a"."b",\'c\'."d$a"."e";', 'echo "abcd$a"."e"');
 
@@ -47,6 +44,7 @@ check('class C { private static $x; function f($x) { self::$x; $x; } }', 'class 
 check('class C { static array $x; }', 'class C{static array$x;}');
 check('class C { public static $x; } echo C::$x;', 'class C{static$x;}echo C::$x;');
 check('class C { static $x; }', 'class C{static$x;}');
+check('class C { static public $x; }', 'class C{static$x;}');
 check('function f() { static $x; return $x; }', 'function f(){static$a;return$a;}');
 check('class C { static $x, $y; function f() { static $x, $y; } }', 'class C{static$x,$y;function f(){static$a,$b;}}');
 check('class C { const AB = 1; }', 'class C{const AB=1;}');

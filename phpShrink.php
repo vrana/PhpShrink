@@ -156,7 +156,8 @@ function phpShrink($input) {
 			}
 			if ($token[0] == T_VAR || $token[0] == T_PUBLIC || $token[0] == T_PROTECTED || $token[0] == T_PRIVATE || ($token[0] == T_STATIC && inClass($contexts))) {
 				if ($token[0] == T_PUBLIC) {
-					$token[1] = ($tokens[$i+2][1][0] == '$' ? 'var' : '');
+					// 'static $x' doesn't need var; 'static var $x' would be invalid
+					$token[1] = ($tokens[$i+2][1][0] == '$' && $tokens[$i-2][0] != T_STATIC ? 'var' : '');
 				}
 				$shortening = false;
 			} elseif (!$shortening) {
@@ -165,6 +166,9 @@ function phpShrink($input) {
 				}
 			} elseif ($token[0] === T_VARIABLE && !isset($special_variables[$token[1]]) && $tokens[$i-1][0] != T_DOUBLE_COLON) {
 				$token[1] = '$' . $short_variables[$token[1]];
+			}
+			if ($token[1] === '') { // public dropped before static or function
+				continue;
 			}
 			$last = substr($output, -1);
 			if (($last == '-' || $last == '+') && $token[1][0] == $last) {
