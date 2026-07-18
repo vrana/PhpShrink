@@ -107,7 +107,7 @@ function phpShrink($input) {
 	$tokens = array_values($tokens);
 
 	// compute short version of variables
-	$special_variables = array_flip(array('$this', '$GLOBALS', '$_GET', '$_POST', '$_FILES', '$_COOKIE', '$_SESSION', '$_SERVER', '$http_response_header', '$php_errormsg'));
+	$special_variables = array_flip(array('$this', '$GLOBALS', '$_GET', '$_POST', '$_FILES', '$_COOKIE', '$_SESSION', '$_SERVER', '$_ENV', '$_REQUEST', '$argc', '$argv', '$http_response_header', '$php_errormsg'));
 	$short_variables = array();
 	foreach ($tokens as $i => $token) {
 		if ($token[0] === T_VARIABLE) {
