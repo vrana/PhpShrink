@@ -87,7 +87,7 @@ function phpShrink($input) {
 			} elseif ($shorten > 1) {
 				$shorten = 0;
 			}
-		} elseif ($token[0] == T_CURLY_OPEN) {
+		} elseif ($token[0] == T_CURLY_OPEN || $token[0] == T_DOLLAR_OPEN_CURLY_BRACES) {
 			$in_curly = true;
 		} elseif ($token == array(0, '}')) {
 			if ($in_curly) {
@@ -110,10 +110,11 @@ function phpShrink($input) {
 	$special_variables = array_flip(array('$this', '$GLOBALS', '$_GET', '$_POST', '$_FILES', '$_COOKIE', '$_SESSION', '$_SERVER', '$_ENV', '$_REQUEST', '$argc', '$argv', '$http_response_header', '$php_errormsg'));
 	$short_variables = array();
 	foreach ($tokens as $i => $token) {
-		if ($token[0] === T_VARIABLE) {
-			if (!isset($special_variables[$token[1]])) {
-				$short_variables[$token[1]] = arrayIdx($short_variables, $token[1], 0) + 1;
-			} elseif ($token[1] == '$GLOBALS') {
+		if ($token[0] === T_VARIABLE || $token[0] === T_STRING_VARNAME) {
+			$name = ($token[0] === T_VARIABLE ? $token[1] : '$' . $token[1]); // T_STRING_VARNAME is in "${ab}"
+			if (!isset($special_variables[$name])) {
+				$short_variables[$name] = arrayIdx($short_variables, $name, 0) + 1;
+			} elseif ($name == '$GLOBALS') {
 				trigger_error('$GLOBALS is not supported, use global', E_USER_WARNING);
 			}
 		}
@@ -166,6 +167,8 @@ function phpShrink($input) {
 				}
 			} elseif ($token[0] === T_VARIABLE && !isset($special_variables[$token[1]]) && $tokens[$i-1][0] != T_DOUBLE_COLON) {
 				$token[1] = '$' . $short_variables[$token[1]];
+			} elseif ($token[0] === T_STRING_VARNAME && !isset($special_variables['$' . $token[1]])) {
+				$token[1] = $short_variables['$' . $token[1]];
 			}
 			if ($token[1] === '') { // public dropped before static or function
 				continue;
