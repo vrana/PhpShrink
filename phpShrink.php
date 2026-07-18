@@ -157,8 +157,9 @@ function phpShrink($input) {
 			}
 			if ($token[0] == T_VAR || $token[0] == T_PUBLIC || $token[0] == T_PROTECTED || $token[0] == T_PRIVATE || ($token[0] == T_STATIC && inClass($contexts))) {
 				if ($token[0] == T_PUBLIC) {
+					$skip = array(T_WHITESPACE, T_COMMENT, T_DOC_COMMENT);
 					// 'static $x' doesn't need var; 'static var $x' would be invalid
-					$token[1] = ($tokens[$i+2][1][0] == '$' && $tokens[$i-2][0] != T_STATIC ? 'var' : '');
+					$token[1] = (nextToken($tokens, $i, T_VARIABLE, $skip) && !prevToken($tokens, $i, T_STATIC, $skip) ? 'var' : '');
 				}
 				$shortening = false;
 			} elseif (!$shortening) {
@@ -202,6 +203,12 @@ function inClass($contexts) {
 
 function nextToken($tokens, $i, $search, $allowed = array()) {
 	for ($i++; isset($tokens[$i]) && in_array($tokens[$i][0], $allowed); $i++) {
+	}
+	return (isset($tokens[$i]) && $tokens[$i][0] === $search ? $i : 0);
+}
+
+function prevToken($tokens, $i, $search, $allowed = array()) {
+	for ($i--; isset($tokens[$i]) && in_array($tokens[$i][0], $allowed); $i--) {
 	}
 	return (isset($tokens[$i]) && $tokens[$i][0] === $search ? $i : 0);
 }

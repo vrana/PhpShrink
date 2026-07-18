@@ -45,6 +45,8 @@ check('class C { static array $x; }', 'class C{static array$x;}');
 check('class C { public static $x; } echo C::$x;', 'class C{static$x;}echo C::$x;');
 check('class C { static $x; }', 'class C{static$x;}');
 check('class C { static public $x; }', 'class C{static$x;}');
+check('class C { public /* c */ $x = 1; }', 'class C{var$x=1;}');
+check('class C { static /* c */ public $x; }', 'class C{static$x;}');
 check('function f() { static $x; return $x; }', 'function f(){static$a;return$a;}');
 check('class C { static $x, $y; function f() { static $x, $y; } }', 'class C{static$x,$y;function f(){static$a,$b;}}');
 check('class C { const AB = 1; }', 'class C{const AB=1;}');
