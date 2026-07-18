@@ -5,20 +5,33 @@
 * @return string
 */
 function phpShrink($input) {
-	//! ignore in strings and doc comment
-	$input = preg_replace("~<\\?php\\s*\\?>\n?|\\?>\n?<\\?php|(<\\?php\\s)\\s+|\\?>\n?\$~", '\1', $input);
-	$tokens = token_get_all($input);
-
-	/* change ?>HTML<?php to echo '' */
-	foreach ($tokens as $i => $token) {
+	/* normalize tokens - keep only the first open tag, change ?> to ';' and HTML to echo '' */
+	$tokens = array();
+	foreach (token_get_all($input) as $token) {
 		if (!is_array($token)) {
-			$tokens[$i] = array(0, $token);
+			$token = array(0, $token);
 		}
-		if (isset($tokens[$i+4]) && $tokens[$i+2][0] === T_CLOSE_TAG && $tokens[$i+3][0] === T_INLINE_HTML && $tokens[$i+4][0] === T_OPEN_TAG) {
+		if ($token[0] == T_OPEN_TAG) {
+			if (!$tokens) {
+				$tokens[] = array(T_OPEN_TAG, "<?php\n");
+			}
+		} elseif ($token[0] == T_OPEN_TAG_WITH_ECHO) {
+			$tokens[] = array(T_ECHO, 'echo');
+		} elseif ($token[0] == T_CLOSE_TAG) {
+			for ($i = count($tokens) - 1; in_array($tokens[$i][0], array(T_WHITESPACE, T_COMMENT, T_DOC_COMMENT)); $i--) {
+			}
+			if ($tokens[$i][0] != T_OPEN_TAG && !in_array($tokens[$i][1], array(';', ':', '{', '}'))) {
+				$tokens[] = array(0, ';'); /* ?> terminates a statement */
+			}
+		} elseif ($token[0] == T_INLINE_HTML) {
 			// we do this even if the output is longer to profit from joining consecutive echos
-			$tokens[$i+2] = array(T_ECHO, 'echo');
-			$tokens[$i+3] = array(T_CONSTANT_ENCAPSED_STRING, "'" . addcslashes($tokens[$i+3][1], "\\'") . "'");
-			$tokens[$i+4] = array(0, ';');
+			$tokens[] = array(T_ECHO, 'echo');
+			$tokens[] = array(T_CONSTANT_ENCAPSED_STRING, "'" . addcslashes($token[1], "\\'") . "'");
+			$tokens[] = array(0, ';');
+		} elseif ($token[0] == T_WHITESPACE && $tokens[count($tokens) - 1][0] == T_OPEN_TAG) {
+			// strip whitespace after <?php
+		} else {
+			$tokens[] = $token;
 		}
 	}
 
@@ -64,7 +77,7 @@ function phpShrink($input) {
 		if (in_array($token[0], array(T_IF, T_ELSE, T_ELSEIF, T_WHILE, T_DO, T_FOR, T_FOREACH))) {
 			$shorten = ($token[0] == T_FOR ? 4 : 2);
 			$opening = -1;
-		} elseif (in_array($token[0], array(T_SWITCH, T_FUNCTION, T_CLASS, T_CLOSE_TAG))) {
+		} elseif (in_array($token[0], array(T_SWITCH, T_FUNCTION, T_CLASS))) {
 			$shorten = 0;
 		} elseif ($token == array(0, ';')) {
 			$shorten--;
