@@ -159,7 +159,9 @@ function phpShrink($input) {
 				$token[1] = '$' . $short_variables[$token[1]];
 			}
 			$last = substr($output, -1);
-			if (isset($set[$last]) || isset($set[$token[1][0]])
+			if (($last == '-' || $last == '+') && $token[1][0] == $last) {
+				// keep space so that '$a - -1' doesn't merge into '$a--1'
+			} elseif (isset($set[$last]) || isset($set[$token[1][0]])
 				|| ($last == '.' && $token[0] != T_LNUMBER && $token[0] != T_DNUMBER)
 				|| ($token[1] == '.' && !preg_match('~[0-9]~', $last))
 			) {

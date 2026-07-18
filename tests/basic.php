@@ -82,6 +82,10 @@ check('echo 1 ?>', 'echo 1;');
 check('echo 1 ?>2<?php echo 3;', "echo 1,'2',3;");
 check('if (true): ?>a<?php endif;', "if(true):echo'a';endif;");
 check('if (false) ?>a<?php echo 1;', "if(false);echo'a',1;"); /* HTML after `if () ?>` is unconditional */
+check('$a - -1;', '$a- -1;');
+check('$a + +$a;', '$a+ +$a;');
+check('$a - --$a;', '$a- --$a;');
+check('$a-- - $a;', '$a-- -$a;');
 check('A . 1', 'A. 1');
 check('A . 1.1', 'A. 1.1');
 check('1 . A', '1 .A');
