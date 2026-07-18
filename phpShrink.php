@@ -77,7 +77,7 @@ function phpShrink($input) {
 		if (in_array($token[0], array(T_IF, T_ELSE, T_ELSEIF, T_WHILE, T_DO, T_FOR, T_FOREACH))) {
 			$shorten = ($token[0] == T_FOR ? 4 : 2);
 			$opening = -1;
-		} elseif (in_array($token[0], array(T_SWITCH, T_FUNCTION, T_CLASS))) {
+		} elseif (in_array($token[0], array(T_SWITCH, T_FUNCTION, T_CLASS, T_INTERFACE, T_TRAIT, T_TRY))) {
 			$shorten = 0;
 		} elseif ($token == array(0, ';')) {
 			$shorten--;

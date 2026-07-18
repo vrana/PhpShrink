@@ -86,6 +86,7 @@ check('$a - -1;', '$a- -1;');
 check('$a + +$a;', '$a+ +$a;');
 check('$a - --$a;', '$a- --$a;');
 check('$a-- - $a;', '$a-- -$a;');
+check('if ($c) try { f(); } catch (Exception $e) { g(); }', 'if($a)try{f();}catch(Exception$b){g();}');
 check('A . 1', 'A. 1');
 check('A . 1.1', 'A. 1.1');
 check('1 . A', '1 .A');
