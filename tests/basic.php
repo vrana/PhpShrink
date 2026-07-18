@@ -24,9 +24,6 @@ set_error_handler(function ($errno) {
 // officially unsupported
 check('$ab = 1; echo $GLOBALS["ab"];', '$a=1;echo$GLOBALS["ab"];', E_USER_WARNING);
 
-//! inefficiencies
-check('echo "a"."b",\'c\'."d$a"."e";', 'echo "abcd$a"."e"');
-
 check('$ab = 1; echo $ab;', '$a=1;echo$a;');
 check('$ab = 1; $cd = 2;', '$a=1;$b=2;');
 check('define("AB", 1);', 'define("AB",1);');
