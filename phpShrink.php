@@ -232,6 +232,11 @@ function stripTypes($input) {
 		. ')\s*(&?\s*\$)~', '\1\3', $return
 	);
 	$return = preg_replace('~(((public|protected|private|var|static)\b\s*)++)\??\s*[\w\\\\]+\s*(\$)~', '\1\4', $return);
-	$return = preg_replace('~\):\s*\??\s*[\w\\\\]+(\s*[;{])~U', ')\1', $return);
+	// anchor on the whole signature so that a ternary like '$a ? f($b) : false' doesn't match
+	$return = preg_replace(
+		'~(\bfunction\s*&?\s*\w*\s*(\(((?>[^()]+)|(?2))*\))(\s*use\s*\([^()]*\))?)\s*:\s*\??\s*[\w\\\\]+~',
+		'\1',
+		$return
+	);
 	return $return;
 }

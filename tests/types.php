@@ -36,6 +36,13 @@ check('public static array $a;', 'public static $a;');
 check('static public $a;', 'static public $a;');
 check('function f(iterable $a);', 'function f($a);');
 check('function f(?iterable $a);', 'function f($a);');
+check('function f() : int {}', 'function f() {}');
+check('function f() : ?int;', 'function f();');
+check('return $a ? f($b) : false;', 'return $a ? f($b) : false;');
+check('return $a ? f($b): false;', 'return $a ? f($b): false;');
+check('function () use ($a) : int {};', 'function () use ($a) {};');
+check('function f($a = array(array(1))) : int {}', 'function f($a = array(array(1))) {}');
+check('function &f() : int {}', 'function &f() {}');
 
 // not supported
 check('var A|B $a;', 'var A|B $a;');
