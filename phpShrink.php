@@ -134,7 +134,8 @@ function phpShrink($input) {
 	$set = array_flip(preg_split('//', '!"#$%&\'()*+,-/:;<=>?@[]^`{|}'));
 	$space = '';
 	$output = '';
-	$static = 0; // context of the static keyword
+	$contexts = array(); // T_CLASS or T_FUNCTION for each open brace
+	$pending = 0; // context opened by the next brace
 	$doc_comment = false; // include only first /**
 	foreach ($tokens as $i => $token) {
 		if ($token[0] == T_COMMENT || $token[0] == T_WHITESPACE || ($token[0] == T_DOC_COMMENT && $doc_comment)) {
@@ -143,16 +144,23 @@ function phpShrink($input) {
 			if ($token[0] == T_DOC_COMMENT) {
 				$doc_comment = true;
 			}
-			if ($token[0] == T_FUNCTION || $token[0] == T_CLASS) {
-				$static = $token[0];
+			if (in_array($token[0], array(T_FUNCTION, T_CLASS, T_INTERFACE, T_TRAIT))) {
+				$pending = ($token[0] == T_FUNCTION ? T_FUNCTION : T_CLASS);
+			} elseif ($token[1] == ';') {
+				$pending = 0; // method declaration without a body
+			} elseif ($token[1] == '{' || $token[1] == '${') {
+				$contexts[] = $pending;
+				$pending = 0;
+			} elseif ($token[1] == '}') {
+				array_pop($contexts);
 			}
-			if ($token[0] == T_VAR || $token[0] == T_PUBLIC || $token[0] == T_PROTECTED || $token[0] == T_PRIVATE || ($token[0] == T_STATIC && $static != T_FUNCTION)) {
+			if ($token[0] == T_VAR || $token[0] == T_PUBLIC || $token[0] == T_PROTECTED || $token[0] == T_PRIVATE || ($token[0] == T_STATIC && inClass($contexts))) {
 				if ($token[0] == T_PUBLIC) {
 					$token[1] = ($tokens[$i+2][1][0] == '$' ? 'var' : '');
 				}
 				$shortening = false;
 			} elseif (!$shortening) {
-				if ($token[1] == ';' || $token[0] == T_FUNCTION || ($token[0] == T_STATIC && $static == T_FUNCTION)) {
+				if ($token[1] == ';' || $token[0] == T_FUNCTION || ($token[0] == T_STATIC && !inClass($contexts))) {
 					$shortening = true;
 				}
 			} elseif ($token[0] === T_VARIABLE && !isset($special_variables[$token[1]]) && $tokens[$i-1][0] != T_DOUBLE_COLON) {
@@ -173,6 +181,16 @@ function phpShrink($input) {
 	}
 
 	return $output;
+}
+
+// find out if the innermost named context in $contexts is a class
+function inClass($contexts) {
+	for ($i = count($contexts) - 1; $i >= 0; $i--) {
+		if ($contexts[$i]) {
+			return ($contexts[$i] == T_CLASS);
+		}
+	}
+	return false;
 }
 
 function nextToken($tokens, $i, $search, $allowed = array()) {
