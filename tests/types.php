@@ -11,9 +11,6 @@ function check($code, $expected) {
 	}
 }
 
-// bugs
-check('"var int $a";', '"var $a";');
-
 check('function f(int $a) {}', 'function f($a) {}');
 check('function f(int $a);', 'function f($a);');
 check('function f(array $a, string $b);', 'function f(array $a, $b);');
@@ -43,6 +40,21 @@ check('return $a ? f($b): false;', 'return $a ? f($b): false;');
 check('function () use ($a) : int {};', 'function () use ($a) {};');
 check('function f($a = array(array(1))) : int {}', 'function f($a = array(array(1))) {}');
 check('function &f() : int {}', 'function &f() {}');
+
+// strings, comments and inline HTML are not code
+check('"var int $a";', '"var int $a";');
+check("'protected \\\$translations';", "'protected \\\$translations';");
+check("preg_match('~\\n\\tprotected \\\$t~s', \$s);", "preg_match('~\\n\\tprotected \\\$t~s', \$s);");
+check('$a = "public int $b";', '$a = "public int $b";');
+check('<<<\'X\'
+private string $a;
+X;', '<<<\'X\'
+private string $a;
+X;');
+check('/* function f(): int */', '/* function f(): int */');
+check('<?php ?>public int $a;', '<?php ?>public int $a;');
+check("function f(int \$a = 'x', string \$b) {}", "function f(\$a = 'x', \$b) {}");
+check("function f(\$a = 'x'): int {}", "function f(\$a = 'x') {}");
 
 // not supported
 check('var A|B $a;', 'var A|B $a;');

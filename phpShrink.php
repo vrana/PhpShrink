@@ -226,14 +226,59 @@ function arrayIdx($array, $key, $default = null) {
 	return (array_key_exists($key, $array) ? $array[$key] : $default);
 }
 
+/** Replace strings, comments and inline HTML by placeholders so that they are not modified as code
+* @param string
+* @param array output, texts of the masked tokens
+* @return string
+*/
+function maskStrings($input, &$masked) {
+	$masked = array();
+	$tokens = token_get_all($input);
+	$open = false;
+	foreach ($tokens as $token) {
+		if (is_array($token) && ($token[0] == T_OPEN_TAG || $token[0] == T_OPEN_TAG_WITH_ECHO)) {
+			$open = true;
+			break;
+		}
+	}
+	if (!$open) { // allow processing code snippets without <?php
+		$tokens = token_get_all("<?php " . $input);
+		array_shift($tokens);
+	}
+	$return = '';
+	$mask = array(T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE, T_INLINE_HTML, T_COMMENT, T_DOC_COMMENT);
+	foreach ($tokens as $token) {
+		if (is_array($token) && in_array($token[0], $mask)) {
+			$return .= "\0" . count($masked) . "\0"; // \0 is not allowed in PHP code so it can't come from the input
+			$masked[] = $token[1];
+		} else {
+			$return .= (is_array($token) ? $token[1] : $token);
+		}
+	}
+	return $return;
+}
+
+/** Put back the texts masked by maskStrings()
+* @param string
+* @param array
+* @return string
+*/
+function unmaskStrings($input, $masked) {
+	$return = '';
+	foreach (preg_split('~\0([0-9]+)\0~', $input, -1, PREG_SPLIT_DELIM_CAPTURE) as $i => $part) {
+		$return .= ($i % 2 ? $masked[$part] : $part);
+	}
+	return $return;
+}
+
 /** Strip type declarations not supported by PHP 5
 * @param string
 * @return string
 */
 function stripTypes($input) {
-	// this uses a simple regulat expression, it doesn't even ignore strings
+	// this uses simple regular expressions on code with strings and comments masked out
 	// anything more complicated should be done using https://github.com/nikic/PHP-Parser
-	$return = $input;
+	$return = maskStrings($input, $masked);
 	$return = preg_replace(
 		'~([(,]\s*)(' // only match after ( or ,
 		. '\?[\w\\\\]+' // nullable
@@ -248,5 +293,5 @@ function stripTypes($input) {
 		'\1',
 		$return
 	);
-	return $return;
+	return unmaskStrings($return, $masked);
 }

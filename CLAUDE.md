@@ -32,7 +32,7 @@ PhpShrink is a PHP minifier in a single file, `phpShrink.php`, exposing two inde
   5. Renames local variables to shortest names, most-frequent first (skips superglobals/`$this`; `$GLOBALS` triggers a warning – unsupported). Renaming is suspended after `var`/`public`/`protected`/`private`/class-level `static` so property names are preserved; `public` itself becomes `var` (or is dropped before functions)
   6. Emits tokens, collapsing whitespace to at most one `\n` and dropping comments (the first doc-comment is kept – typically the license header)
 
-- **`stripTypes($input)`** – regex-based removal of PHP 7 scalar type declarations (parameter, property, return types) to produce PHP 5–compatible output. Deliberately simple: does not tokenize, does not handle union/intersection types.
+- **`stripTypes($input)`** – regex-based removal of PHP 7 scalar type declarations (parameter, property, return types) to produce PHP 5–compatible output. Tokenization is used only by `maskStrings()`/`unmaskStrings()`, which replace strings, comments and inline HTML by `\0<number>\0` placeholders so that the regexes see code only; the regexes themselves are deliberately simple and don't handle union/intersection types.
 
 The main consumer is Adminer's `compile.php` (this repo is the `externals/PhpShrink` submodule).
 
