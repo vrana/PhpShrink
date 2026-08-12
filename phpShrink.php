@@ -3,6 +3,8 @@
 /** Minify PHP code. Based on http://latrine.dgx.cz/jak-zredukovat-php-skripty.
 * @param string PHP code including <?php
 * @return string
+* @license https://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
+* @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License, version 2 (one or other)
 */
 function phpShrink($input) {
 	/* normalize tokens - keep only the first open tag, change ?> to ';' and HTML to echo '' */
