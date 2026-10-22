@@ -25,7 +25,7 @@ echo $abc;
 <script type="text/javascript">
 let highlightShrink;
 (async function () {
-	const { PhpWeb } = await import('https://cdn.jsdelivr.net/npm/php-wasm@0.1.0/PhpWeb.mjs');
+	const { PhpWeb } = await import('https://cdn.jsdelivr.net/npm/php-wasm/PhpWeb.mjs');
 	php = new PhpWeb();
 	php.addEventListener('output', event => console.log(event.detail));
 	php.addEventListener('error',  event => console.error(event.detail));
