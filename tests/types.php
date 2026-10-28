@@ -2,12 +2,16 @@
 <?php
 include __DIR__ . "/../phpShrink.php";
 
+$failed = 0;
+
 function check($code, $expected) {
+	global $failed;
 	$stripped = stripTypes($code);
 	if ($stripped != $expected) {
 		$backtrace = debug_backtrace();
 		$backtrace = $backtrace[0];
 		echo "$backtrace[file]:$backtrace[line]:$stripped\n";
+		$failed++;
 	}
 }
 
@@ -58,3 +62,5 @@ check("function f(\$a = 'x'): int {}", "function f(\$a = 'x') {}");
 
 // not supported
 check('var A|B $a;', 'var A|B $a;');
+
+exit($failed ? 1 : 0);

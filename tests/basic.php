@@ -3,15 +3,17 @@
 include __DIR__ . "/../phpShrink.php";
 
 $last_error = 0;
+$failed = 0;
 
 function check($code, $expected, $error = 0) {
-	global $last_error;
+	global $last_error, $failed;
 	$last_error = 0;
 	$shrinked = str_replace("\n", " ", phpShrink("<?php\n$code"));
 	if ($last_error != $error || "<?php $expected" != $shrinked) {
 		$backtrace = debug_backtrace();
 		$backtrace = $backtrace[0];
 		echo "$backtrace[file]:$backtrace[line]:" . substr($shrinked, 6) . ($last_error != $error ? " (error: $last_error)" : "") . "\n";
+		$failed++;
 	}
 }
 
@@ -97,3 +99,5 @@ check('A . 1', 'A. 1');
 check('A . 1.1', 'A. 1.1');
 check('1 . A', '1 .A');
 check('1. . A', '1..A');
+
+exit($failed ? 1 : 0);

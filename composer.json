@@ -19,5 +19,11 @@
     ],
     "require": {
         "php": ">=5.3"
+    },
+    "scripts": {
+        "test": [
+            "@php tests/basic.php",
+            "@php tests/types.php"
+        ]
     }
 }

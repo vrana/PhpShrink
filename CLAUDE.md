@@ -4,8 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-**Run tests** (no framework – plain PHP scripts; each failing check prints `file:line:actual-output`):
+**Run tests** (no framework – plain PHP scripts; each failing check prints `file:line:actual-output` and the script exits with 1):
 ```bash
+composer test          # runs all of them
 php tests/basic.php    # tests phpShrink()
 php tests/types.php    # tests stripTypes()
 ```
