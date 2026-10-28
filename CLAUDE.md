@@ -9,9 +9,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 composer test          # runs all of them
 php tests/basic.php    # tests phpShrink()
 php tests/types.php    # tests stripTypes()
+php tests/arrays.php   # tests shortArrays()
 ```
 
-On a clean tree, both scripts print nothing; any output is a regression.
+On a clean tree, the scripts print nothing; any output is a regression.
 
 **Run the minifier from CLI:**
 ```bash
@@ -23,7 +24,7 @@ There is no linter or build step. `composer.json` declares no dependencies.
 
 ## Architecture
 
-PhpShrink is a PHP minifier in a single file, `phpShrink.php`, exposing two independent functions:
+PhpShrink is a PHP minifier in a single file, `phpShrink.php`, exposing three independent functions:
 
 - **`phpShrink($input)`** – tokenizes the source with `token_get_all()` and runs sequential passes over the token array:
   1. Regex pre-pass: removes `?><?php`, empty `<?php ?>`, trailing `?>`
@@ -34,6 +35,8 @@ PhpShrink is a PHP minifier in a single file, `phpShrink.php`, exposing two inde
   6. Emits tokens, collapsing whitespace to at most one `\n` and dropping comments (the first doc-comment is kept – typically the license header)
 
 - **`stripTypes($input)`** – regex-based removal of PHP 7 scalar type declarations (parameter, property, return types) to produce PHP 5–compatible output. Tokenization is used only by `maskStrings()`/`unmaskStrings()`, which replace strings, comments and inline HTML by `\0<number>\0` placeholders so that the regexes see code only; the regexes themselves are deliberately simple and don't handle union/intersection types.
+
+- **`shortArrays($input)`** – token-based conversion of `array(...)` to `[...]` (PHP 5.4 syntax), saving 5 bytes per array. `array` not followed by `(` (a type declaration or a cast) and everything in strings, comments and inline HTML are kept. It matches each `)` to its `(` by a stack.
 
 The main consumer is Adminer's `compile.php` (this repo is the `externals/PhpShrink` submodule).
 

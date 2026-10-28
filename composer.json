@@ -23,7 +23,8 @@
     "scripts": {
         "test": [
             "@php tests/basic.php",
-            "@php tests/types.php"
+            "@php tests/types.php",
+            "@php tests/arrays.php"
         ]
     }
 }

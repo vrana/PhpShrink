@@ -297,3 +297,34 @@ function stripTypes($input) {
 	);
 	return unmaskStrings($return, $masked);
 }
+
+/** Convert array() to [] supported since PHP 5.4
+* @param string PHP code including <?php
+* @return string
+*/
+function shortArrays($input) {
+	$tokens = token_get_all($input);
+	$return = '';
+	$stack = array(); // for each open (: whether it belongs to array(
+	$opening = -1; // index of ( after array
+	foreach ($tokens as $i => $token) {
+		$text = (is_array($token) ? $token[1] : $token);
+		if (is_array($token) && $token[0] == T_ARRAY) {
+			for ($j = $i + 1; isset($tokens[$j]) && is_array($tokens[$j]) && in_array($tokens[$j][0], array(T_WHITESPACE, T_COMMENT, T_DOC_COMMENT)); $j++) {
+			}
+			if (isset($tokens[$j]) && $tokens[$j] === '(') { // not a type declaration
+				$opening = $j;
+				$text = '[';
+			}
+		} elseif ($text === '(') {
+			$stack[] = ($i == $opening);
+			if ($i == $opening) {
+				continue;
+			}
+		} elseif ($text === ')' && array_pop($stack)) {
+			$text = ']';
+		}
+		$return .= $text;
+	}
+	return $return;
+}

@@ -99,5 +99,11 @@ check('A . 1', 'A. 1');
 check('A . 1.1', 'A. 1.1');
 check('1 . A', '1 .A');
 check('1. . A', '1..A');
+check('$ab = [1, 2]; echo $ab[0];', '$a=[1,2];echo$a[0];');
+check('$ab = ["k" => [$cd, 2]];', '$a=["k"=>[$b,2]];');
+check('foreach ([1, 2] as $ab) { echo $ab; }', 'foreach([1,2]as$a)echo$a;');
+check('list($ab) = [1];', 'list($a)=[1];');
+check('class C { public $ab = []; }', 'class C{var$ab=[];}');
+check('function f(array $ab = []) { return $ab; }', 'function f(array$a=[]){return$a;}');
 
 exit($failed ? 1 : 0);
